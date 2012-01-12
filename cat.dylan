@@ -13,20 +13,13 @@ end method cat;
 define method cat (thing :: <stream>) => ()
   block()
     while(#t)
-      format-out("looping...\n");
-      force-output(*standard-output*);
       let buf = read(thing, $bufsize);
-      //write(*standard-output*, buf);
+      write(*standard-output*, buf);
     end while;
   exception (e :: <incomplete-read-error>)
-    format-out("<incomplete-read-error>\n");
-    force-output(*standard-output*);
-    //write(*standard-output*, e.stream-error-sequence, end: e.stream-error-count);
+    write(*standard-output*, e.stream-error-sequence, end: e.stream-error-count);
   exception (e :: <end-of-stream-error>)
-    format-out("<end-of-stream-error>\n");
-    force-output(*standard-output*);
-  end block();
-  format-out("after block()\n");
+  end block;
   force-output(*standard-output*);
 end method cat;
 
