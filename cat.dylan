@@ -1,5 +1,7 @@
 module: cat
 
+define constant $bufsize :: <integer> = 8192;
+
 define generic cat (thing) => ();
 
 define method cat (thing :: <string>) => ()
@@ -11,17 +13,14 @@ end method cat;
 define method cat (thing :: <stream>) => ()
   block()
     while(#t)
-      let (line, newline?) = read-line(thing);
-
-      write(*standard-output*, line);
-      if(newline?)
-        write-element(*standard-output*, '\n');
-      end if;
-
-      force-output(*standard-output*); // is this necessary?
+      let buf = read(thing, $bufsize);
+      write(*standard-output*, buf);
     end while;
+  exception (e :: <incomplete-read-error>)
+    write(*standard-output*, e.stream-error-sequence, end: e.stream-error-count);
   exception (e :: <end-of-stream-error>)
-  end block;
+  end block();
+  force-output(*standard-output*);
 end method cat;
 
 define function main(app-name :: <string>, args :: <vector>) => ()
